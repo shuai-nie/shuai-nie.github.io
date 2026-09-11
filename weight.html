@@ -55,7 +55,7 @@
       const chartDom = document.getElementById('chart');
       try {
         // 1. 获取 JSON 数据
-        const json = await loadJsonData('./weight.json');
+        const json = await loadJsonData('./data.json');
         const rawValues = Array.isArray(json) ? json : (json.values || []);
 
         // 2. 计算时间区间并过滤
@@ -73,6 +73,11 @@
           type: 'line',
           xField: 'month',
           yField: 'sales',
+		  title: {
+			text: '一月体重数据',      // 主标题
+			subtext: '数据来源：内部统计', // 副标题（可选）
+			align: 'center'           // 对齐方式：'left' | 'center' | 'right'
+		  },
           tooltip: {
             mark: {
               content: [
