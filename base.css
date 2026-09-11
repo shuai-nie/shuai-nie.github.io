@@ -1,0 +1,220 @@
+/* ==================== 全局重置 ==================== */
+
+/* 1. 统一盒模型，让 padding/border 不再撑大元素 */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* 2. 去掉所有元素默认的 margin 和 padding */
+* {
+  margin: 0;
+  padding: 0;
+}
+
+/* 3. 页面基础设置 */
+html {
+  -webkit-text-size-adjust: 100%; /* 防止 iOS 横屏时字体自动放大 */
+  -moz-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  line-height: 1.5;
+  -webkit-tap-highlight-color: transparent; /* 去掉移动端点击高亮 */
+}
+
+body {
+  min-height: 100vh;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-size: 14px;
+  color: #333;
+  background-color: #fff;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ==================== 文本元素 ==================== */
+
+/* 标题去掉默认字号和加粗 */
+h1, h2, h3, h4, h5, h6 {
+  font-size: inherit;
+  font-weight: inherit;
+}
+
+/* 段落、标题等块级元素默认没有间距 */
+p, h1, h2, h3, h4, h5, h6, figure, blockquote, dl, dd {
+  margin: 0;
+}
+
+/* 加粗、斜体保留语义但不改变外观时可自行取舍（此处保留默认） */
+b, strong {
+  font-weight: bolder;
+}
+
+/* 去掉链接默认颜色和下划线 */
+a {
+  color: inherit;
+  text-decoration: none;
+  background-color: transparent;
+}
+
+/* 去掉列表默认样式（圆点、序号、缩进） */
+ul, ol {
+  list-style: none;
+}
+
+/* 去掉引用、代码等默认样式 */
+blockquote, q {
+  quotes: none;
+}
+
+blockquote::before,
+blockquote::after,
+q::before,
+q::after {
+  content: "";
+  content: none;
+}
+
+/* 去掉 hr 默认样式 */
+hr {
+  border: none;
+  border-top: 1px solid #e5e5e5;
+  height: 0;
+  overflow: visible;
+}
+
+/* 小号文字不要变小 */
+small {
+  font-size: 80%;
+}
+
+/* ==================== 媒体元素 ==================== */
+
+/* 图片、视频等默认 inline 会有底部间隙，改为 block 并自适应宽度 */
+img, picture, video, canvas, svg, audio, iframe, embed, object {
+  display: block;
+  max-width: 100%;
+}
+
+img, video {
+  height: auto;
+}
+
+/* ==================== 表单元素 ==================== */
+
+/* 表单元素默认不继承字体，统一继承 */
+input, button, textarea, select, optgroup {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  outline: none;
+}
+
+/* 去掉按钮默认样式 */
+button {
+  cursor: pointer;
+  background-color: transparent;
+  background-image: none;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
+/* 去掉 textarea 默认的右下角拖拽和滚动条 */
+textarea {
+  resize: vertical;
+  overflow: auto;
+}
+
+/* 去掉 input 的默认外观（如 iOS 圆角、阴影） */
+input,
+textarea,
+select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  border-radius: 0;
+}
+
+/* 去掉 number 类型的上下箭头 */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+/* 去掉搜索框的清除按钮 */
+input[type="search"]::-webkit-search-decoration,
+input[type="search"]::-webkit-search-cancel-button,
+input[type="search"]::-webkit-search-results-button,
+input[type="search"]::-webkit-search-results-decoration {
+  -webkit-appearance: none;
+}
+
+/* 去掉 select 的默认箭头（如需保留可删除这段） */
+select::-ms-expand {
+  display: none;
+}
+
+/* placeholder 颜色统一 */
+::placeholder {
+  color: #999;
+  opacity: 1;
+}
+
+/* 去掉 fieldset、legend 默认样式 */
+fieldset {
+  border: none;
+  min-width: 0;
+}
+
+legend {
+  padding: 0;
+}
+
+/* ==================== 表格 ==================== */
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+  width: 100%;
+}
+
+th, td {
+  padding: 0;
+  text-align: left;
+  vertical-align: top;
+}
+
+/* ==================== 其他 ==================== */
+
+/* 去掉 details/summary 默认三角 */
+summary {
+  display: list-item;
+  cursor: pointer;
+}
+
+/* 隐藏元素 */
+[hidden] {
+  display: none !important;
+}
+
+/* 清除浮动（按需使用） */
+.clearfix::after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+/* 防止长单词溢出 */
+body {
+  overflow-wrap: break-word;
+  word-break: break-word;
+}

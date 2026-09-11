@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>工作记录</title>
+  <script src="https://unpkg.com/@visactor/vtable-gantt/dist/vtable-gantt.min.js"></script>
+  <link href='base.css' rel='stylesheet'>
+  <style>
+    html, body { height: 100%; margin: 0; }
+    .loading, .error {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 400px;
+      font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+      font-size: 14px;
+      color: #8a8a99;
+    }
+    .error { color: #e05252; padding: 0 20px; text-align: center; line-height: 1.6; }
+  </style>
+</head>
+<body>
+  <div id="tableContainer" style="position: absolute; width: 100%; height: 400px;">
+    <div class="loading" id="loadingTip">数据加载中...</div>
+  </div>
+</body>
+
+<script type="application/javascript">
+  const container = document.getElementById('tableContainer');
+  const loadingTip = document.getElementById('loadingTip');
+
+  /* ============ 读取 JSON 数据 ============ */
+  async function loadGanttData(url) {
+    const res = await fetch(url, { cache: 'no-store' });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    return res.json();
+  }
+
+  /* ============ 构建甘特图配置 ============ */
+  function buildOption(records) {
+    const columns = [
+      {
+        field: 'title',
+        title: '任务名称',
+        width: 'auto',
+        sort: true,
+        tree: true
+      },
+      {
+        field: 'start',
+        title: '开始时间',
+        width: 'auto',
+        sort: true
+      },
+      {
+        field: 'end',
+        title: '结束时间',
+        width: 'auto',
+        sort: true
+      }
+    ];
+
+    return {
+      overscrollBehavior: 'none',
+      records,
+      taskListTable: {
+        columns,
+        minTableWidth: 100,
+        maxTableWidth: 1200
+      },
+      frame: {
+        outerFrameStyle: { borderLineWidth: 2, borderColor: '#e1e4e8', cornerRadius: 8 },
+        verticalSplitLine: { lineColor: '#e1e4e8', lineWidth: 3 },
+        horizontalSplitLine: { lineColor: '#e1e4e8', lineWidth: 3 },
+        verticalSplitLineMoveable: true,
+        verticalSplitLineHighlight: {
+          lineColor: 'green',
+          lineWidth: 3
+        }
+      },
+      grid: {
+        verticalLine: { lineWidth: 1, lineColor: '#e1e4e8' },
+        horizontalLine: { lineWidth: 1, lineColor: '#e1e4e8' }
+      },
+      headerRowHeight: 40,
+      rowHeight: 40,
+      taskBar: {
+        startDateField: 'start',
+        endDateField: 'end',
+        progressField: 'progress',
+        resizable: true,
+        moveable: true,
+        hoverBarStyle: {
+          barOverlayColor: 'rgba(99, 144, 0, 0.4)'
+        },
+        labelText: '{title}  完成度 {progress}% 状态 ',
+        labelTextStyle: {
+          fontFamily: 'Arial',
+          fontSize: 16,
+          textAlign: 'left',
+          textOverflow: 'ellipsis'
+        },
+        barStyle: {
+          width: 20,
+          barColor: '#ee8800',
+          completedBarColor: '#91e8e0',
+          cornerRadius: 8,
+          borderLineWidth: 1,
+          borderColor: 'black'
+        }
+      },
+      timelineHeader: {
+        colWidth: 100,
+        weekendColWidth: 20,
+        backgroundColor: '#EEF1F5',
+        horizontalLine: { lineWidth: 1, lineColor: '#e1e4e8' },
+        verticalLine: { lineWidth: 1, lineColor: '#e1e4e8' },
+        scales: [
+          {
+            unit: 'week',
+            step: 1,
+            startOfWeek: 'sunday',
+            format(date) {
+              return `周 ${date.dateIndex}`;
+            },
+            style: {
+              fontSize: 20,
+              fontWeight: 'bold',
+              color: 'white',
+              strokeColor: 'black',
+              textAlign: 'right',
+              textBaseline: 'bottom',
+              backgroundColor: '#EEF1F5',
+              textStick: true
+            }
+          },
+          {
+            unit: 'day',
+            step: 1,
+            format(date) {
+              return date.dateIndex.toString();
+            },
+            style: {
+              fontSize: 20,
+              fontWeight: 'bold',
+              color: 'white',
+              strokeColor: 'black',
+              textAlign: 'right',
+              textBaseline: 'bottom',
+              backgroundColor: '#EEF1F5'
+            }
+          }
+        ]
+      },
+      markLine: [
+        {
+          date: '2024/8/02',
+          scrollToMarkLine: true,
+          position: 'left',
+          style: { lineColor: 'red', lineWidth: 1 }
+        }
+      ],
+      rowSeriesNumber: {
+        title: '行号',
+        dragOrder: true,
+        headerStyle: {
+          bgColor: '#EEF1F5',
+          borderColor: '#e1e4e8'
+        },
+        style: { borderColor: '#e1e4e8' }
+      },
+      scrollStyle: {
+        scrollRailColor: 'RGBA(246,246,246,0.5)',
+        visible: 'scrolling',
+        width: 6,
+        scrollSliderCornerRadius: 2,
+        scrollSliderColor: '#5cb85c'
+      }
+    };
+  }
+
+  /* ============ 初始化 ============ */
+  (async function init() {
+    try {
+      const records = await loadGanttData('./task.json');
+      if (loadingTip) loadingTip.remove();
+      new VTableGantt.Gantt(container, buildOption(records));
+    } catch (err) {
+      console.error(err);
+      container.innerHTML =
+        '<div class="error">甘特图数据加载失败：' + err.message +
+        '<br/>请通过本地服务器（如 npx serve / python -m http.server）打开本页面，' +
+        '直接双击 file:// 打开会被浏览器 CORS 策略拦截。</div>';
+    }
+  })();
+</script>
+</html>

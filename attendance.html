@@ -1,0 +1,103 @@
+<html>
+
+<head>
+  <script src="https://unpkg.com/@visactor/vtable/dist/vtable.min.js"></script>
+  <link href='base.css' rel='stylesheet'>
+  <style>
+
+  </style>
+</head>
+
+<body>
+  <div id="tableContainer" style="width: 800px;height:700px;"></div>
+</body>
+<script type="application/javascript">
+  const CONTAINER_ID = document.getElementById('tableContainer');
+
+  // 辅助函数：解析日期，兼容 Safari
+  function parseDate(dateStr) {
+    return new Date(String(dateStr).replace(/-/g, '/'));
+  }
+
+  // 辅助函数：获取星期
+  function getWeekDay(dateStr) {
+    const days = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
+    return days[parseDate(dateStr).getDay()];
+  }
+
+  // 辅助函数：去除年月日，只保留时间 HH:mm:ss
+  function formatTime(timeStr) {
+    if (!timeStr) return '';
+    const parts = String(timeStr).split(' ');
+    return parts.length > 1 ? parts[1] : timeStr;
+  }
+
+  // 辅助函数：计算时长
+  function calculateDuration(startStr, endStr) {
+    if (!startStr || !endStr) return '';
+    const start = parseDate(startStr);
+    const end = parseDate(endStr);
+    const diffMins = Math.floor((end - start) / 60000);
+    if (diffMins < 0) return '数据异常';
+    const h = Math.floor(diffMins / 60);
+    const m = diffMins % 60;
+    return h + '小时' + m + '分钟';
+  }
+
+  // 读取 JSON 并渲染表格
+  async function initTable() {
+    try {
+      const response = await fetch('./attendance.json');
+      if (!response.ok) throw new Error('HTTP ' + response.status);
+      const records = await response.json();
+
+      // 数据处理：添加 week 列、格式化时间、计算时长
+      const processedRecords = records.map(item => {
+        const newItem = Object.assign({}, item);
+        
+        // 1. 通过 time 转换获取星期
+        newItem.week = getWeekDay(newItem.time);
+        
+        // 2. 计算时长（利用原始完整时间）
+        newItem.duration = calculateDuration(newItem.start_time, newItem.end_time);
+        
+        // 3. 将 start_time 和 end_time 去掉年月日
+        newItem.start_time = formatTime(newItem.start_time);
+        newItem.end_time = formatTime(newItem.end_time);
+        
+        return newItem;
+      });
+
+      const columns = [
+        { field: 'time', title: '时间', width: 'auto' },
+        { field: 'week', title: '星期', width: 'auto' },
+        { field: 'start_time', title: '上班时间', width: 'auto' },
+        { field: 'end_time', title: '下班时间', width: 'auto' },
+        { field: 'duration', title: '时长', width: 'auto' }, // 修正了原代码中 field 重复的问题
+		{ field: 'remarks', title: '备注', width: 'auto' },
+      ];
+
+      const option = {
+        records: processedRecords,
+        columns,
+        widthMode: 'standard',
+		rowSeriesNumber: {
+			title: '序号',   // 表头标题，默认为空
+			width: 'auto'    // 列宽，支持数字或 'auto'
+		  }
+      };
+
+      // 创建 VTable 实例
+      const tableInstance = new VTable.ListTable(CONTAINER_ID, option);
+      // 如需手动重绘可调用 tableInstance.render()
+
+    } catch (err) {
+      console.error(err);
+      CONTAINER_ID.innerHTML = '数据加载失败：' + err.message + '<br/>请通过本地服务器打开，避免浏览器 CORS 跨域限制。';
+    }
+  }
+
+  initTable();
+</script>
+
+</html>

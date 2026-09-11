@@ -9,7 +9,7 @@
     <div id="chart" style="width: 100%;height:400px;"></div>
   </body>
 
-  <script>
+  <script type="application/javascript">
     /**
      * 解析 'YYYY-MM-DD' 为本地时区的 Date（避免 new Date(string) 的 UTC 偏移问题）
      */
@@ -73,11 +73,21 @@
           type: 'line',
           xField: 'month',
           yField: 'sales',
+		  axes:[{
+		  orient: 'left',
+		  type: 'linear',
+		  min: 60, 
+		  max: 80,
+		  nice: false
+		  }],
 		  title: {
-			text: '一月体重数据',      // 主标题
-			subtext: '数据来源：内部统计', // 副标题（可选）
+			text: '一个月体重数据(kg)',      // 主标题
+			//subtext: '数据来源：内部统计', // 副标题（可选）
 			align: 'center'           // 对齐方式：'left' | 'center' | 'right'
 		  },
+		  label: {
+			visible: true
+		},
           tooltip: {
             mark: {
               content: [
