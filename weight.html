@@ -55,7 +55,7 @@
       const chartDom = document.getElementById('chart');
       try {
         // 1. 获取 JSON 数据
-        const json = await loadJsonData('./data.json');
+        const json = await loadJsonData('/data.json');
         const rawValues = Array.isArray(json) ? json : (json.values || []);
 
         // 2. 计算时间区间并过滤
